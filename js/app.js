@@ -5,8 +5,10 @@
 
   const renderMovies = function() {
     $('#listings').empty();
-
+    console.log("in renderMovies");
     for (const movie of movies) {
+        console.log("in renderMovies for loop. Title is ", movie.title);
+
       const $col = $('<div>').addClass('col s6');
       const $card = $('<div>').addClass('card hoverable');
       const $content = $('<div>').addClass('card-content center');
@@ -55,6 +57,57 @@
       $('.modal-trigger').leanModal();
     }
   };
+    // ADD YOUR CODE HERE
+    $(document).on('ready', () => {
+      console.log('Doc ready');
 
-  // ADD YOUR CODE HERE
+      $("form").submit((event) => {
+        event.preventDefault();
+        console.log("submit clicked");
+        let movieToSearchFor = $("#search").val();
+        console.log("movieToSearchFor is ",movieToSearchFor);
+        getMovie(movieToSearchFor);
+      });
+
+function getMovie(movieToSearchFor) {
+    console.log("inside getMovie function");
+    $.ajax({
+        url: 'https://omdb-api.now.sh/',
+        method: 'GET',
+        dataType: 'JSON',
+        data: {
+          t: `${movieToSearchFor}`
+        }
+    }).done((response) => {
+        console.log("response is = ", response);
+        parseMovie(response)
+    }).fail((err) => {console.log("error = ", err);})
+}
+
+function parseMovie(response) {
+    let movieID = response.imdbID
+    let moviePoster = response.Poster
+    let movieTitle = response.Title
+    let movieYear = response.Year
+    console.log("movieTitle = ", movieTitle, movieYear, moviePoster, movieID );
+
+    let movie = {
+        title:response.Title,
+        year:response.Year,
+        poster:response.Poster,
+        id:response.imdbID
+    }
+    console.log(movie);
+    movies[0] = movie
+    console.log("movies[0] = ", movies[0]);
+    renderMovies()
+
+
+    // movies[0] = response
+    // console.log("movies[0] = ", movies[0]);
+    // let render = renderMovies()
+}
+
+})
+
 })();
